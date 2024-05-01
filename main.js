@@ -88,7 +88,7 @@ async function fetchAllTasks(){
 async function fetchAllTasksWithTimeout() {
     // Use Promise.race to set a timeout for the fetch operation
     const timeout = new Promise((resolve, reject) => {
-        setTimeout(() => reject(new Error('Task fetch timeout - retrying...')), 300000); // 300,000 ms = 5 minutes
+        setTimeout(() => reject(new Error('Task fetch timeout - retrying...')), 150000); // 300,000 ms = 5 minutes
     });
 
     try {
@@ -109,7 +109,7 @@ async function main() {
         console.log(taskdata[i].data.taskName, taskdata[i].data.totalBountyAmount, taskdata[i].data.bountyAmountPerRound);
 
         if(Number(taskdata[i].data.totalBountyAmount)<Number(taskdata[i].data.bountyAmountPerRound)){
-            const msg = "Task "+ taskdata[i].data.taskName+ " Bounty out! Please refill!"
+            const msg = "Task "+ taskdata[i].data.taskName+ " Bounty out! Task public key: "+ taskdata[i].publicKey;
             const message = {
                 text: msg
             };
@@ -122,8 +122,8 @@ async function main() {
             });  
         }else{
             if(Number(taskdata[i].data.totalBountyAmount)<Number((taskdata[i].data.bountyAmountPerRound))*10){
-                const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/task[i].data.bountyAmountPerRound);
-                const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! Please refill!";
+                const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
+                const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey;
                 console.log(msg);
                 const message = {
                     text: msg
@@ -136,20 +136,21 @@ async function main() {
                     console.error('Error sending message: ', error);
                 });  
             }else{
-                console.log("Task", taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
+    
+                const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
+                const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey;
+                console.log(msg);
             }
         }
         
     }
     }catch(e){
         console.log(e);
+    }finally{
+        setTimeout(main, 600000);
     }
-
 }
 
-
-// Schedule the main function to run every 10 minutes
-setInterval(main, 600000); // 600,000 ms = 10 minutes
 
 // Call main function immediately on script start
 main();
