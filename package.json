@@ -1,0 +1,6 @@
+{
+  "dependencies": {
+    "@_koi/web3.js": "^0.0.7",
+    "config": "^3.3.11"
+  }
+}
