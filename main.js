@@ -1,5 +1,7 @@
 const { PublicKey, Connection } = require('@_koi/web3.js');
 const config = require('config');
+const axios = require('axios');
+const webhookUrl = 'https://hooks.slack.com/services/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';
 
 
 function parseRawK2TaskData({
@@ -107,13 +109,34 @@ async function main() {
         console.log(taskdata[i].data.taskName, taskdata[i].data.totalBountyAmount, taskdata[i].data.bountyAmountPerRound);
 
         if(Number(taskdata[i].data.totalBountyAmount)<Number(taskdata[i].data.bountyAmountPerRound)){
-            console.log("Task", taskdata[i].data.taskName, "Bounty out! Please refill!");
+            const msg = "Task "+ taskdata[i].data.taskName+ " Bounty out! Please refill!"
+            const message = {
+                text: msg
+            };
+            const response = await axios.post(webhookUrl, message)
+            .then(response => {
+                console.log('Message sent: ', response.data);
+            })
+            .catch(error => {
+                console.error('Error sending message: ', error);
+            });  
         }else{
             if(Number(taskdata[i].data.totalBountyAmount)<Number((taskdata[i].data.bountyAmountPerRound))*10){
                 const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/task[i].data.bountyAmountPerRound);
-                console.log("Task", taskdata[i].data.taskName, "Bounty Less than", remainingRounds, "rounds! Please refill!");
+                const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! Please refill!";
+                console.log(msg);
+                const message = {
+                    text: msg
+                };
+                const response = await axios.post(webhookUrl, message)
+                .then(response => {
+                    console.log('Message sent: ', response.data);
+                })
+                .catch(error => {
+                    console.error('Error sending message: ', error);
+                });  
             }else{
-                console.log("Task", taskdata[i].data.totalBountyAmount/task[i].data.bountyAmountPerRound);
+                console.log("Task", taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
             }
         }
         
