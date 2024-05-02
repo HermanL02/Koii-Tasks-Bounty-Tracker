@@ -96,7 +96,7 @@ async function fetchAllTasksWithTimeout() {
     } catch (error) {
         console.error(error);
         console.log("Retrying...");
-        return await fetchAllTasksWithTimeout(); // Retry fetching tasks recursively on failure
+        // return await fetchAllTasksWithTimeout(); // Retry fetching tasks recursively on failure
     }
 }
 
@@ -152,5 +152,5 @@ async function main() {
 }
 
 
-// Call main function immediately on script start
+
 main();
