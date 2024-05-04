@@ -34,17 +34,17 @@ function parseRawK2TaskData({
       distributionRewardsSubmission: rawTaskData.distribution_rewards_submission,
     };
   }
-const whitelistedFilter = {
-    memcmp: {
-      offset: 0 /* offset where the whitelisted bytes start */,
-      bytes: 'aRN1MbEZhbr2W97MTP3RhQjjqHgoZN',
-    },
-  };
+// const whitelistedFilter = {
+//     memcmp: {
+//       offset: 0 /* offset where the whitelisted bytes start */,
+//       bytes: 'aRN1MbEZhbr2W97MTP3RhQjjqHgoZN',
+//     },
+//   };
 const connection = new Connection("https://testnet.koii.network","confirmed");
-const getProgramAccountFilter = () => [whitelistedFilter];
+// const getProgramAccountFilter = () => [whitelistedFilter];
 async function fetchAllTasks(){
     console.log("Fetching start time:", new Date());
-  let taskAccountInfo = await connection.getProgramAccounts(
+  const taskAccountInfo = await connection.getProgramAccounts(
   
     new PublicKey("Koiitask22222222222222222222222222222222222"),
 
@@ -86,17 +86,14 @@ async function fetchAllTasks(){
   return tasks;
 }
 async function fetchAllTasksWithTimeout() {
-    // Use Promise.race to set a timeout for the fetch operation
     const timeout = new Promise((resolve, reject) => {
-        setTimeout(() => reject(new Error('Task fetch timeout - retrying...')), 150000); // 300,000 ms = 5 minutes
+        setTimeout(() => reject(new Error('Task fetch timeout')), 300000); // 300,000 ms = 5 minutes
     });
 
     try {
         return await Promise.race([fetchAllTasks(), timeout]);
     } catch (error) {
         console.error(error);
-        console.log("Retrying...");
-        // return await fetchAllTasksWithTimeout(); // Retry fetching tasks recursively on failure
     }
 }
 
@@ -146,11 +143,11 @@ async function main() {
     }
     }catch(e){
         console.log(e);
-    }finally{
-        setTimeout(main, 600000);
     }
 }
 
 
-
 main();
+setInterval(main, 600000);
+
+
