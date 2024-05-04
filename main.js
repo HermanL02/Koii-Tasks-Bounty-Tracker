@@ -2,7 +2,7 @@ const { PublicKey, Connection } = require('@_koi/web3.js');
 const config = require('config');
 const axios = require('axios');
 const webhookUrl = 'https://hooks.slack.com/services/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';
-
+const connection = new Connection("https://testnet.koii.network","confirmed");
 
 function parseRawK2TaskData({
     rawTaskData,
@@ -40,25 +40,30 @@ function parseRawK2TaskData({
 //       bytes: 'aRN1MbEZhbr2W97MTP3RhQjjqHgoZN',
 //     },
 //   };
-const connection = new Connection("https://testnet.koii.network","confirmed");
+
 // const getProgramAccountFilter = () => [whitelistedFilter];
 async function fetchAllTasks(){
     console.log("Fetching start time:", new Date());
-  const taskAccountInfo = await connection.getProgramAccounts(
-  
-    new PublicKey("Koiitask22222222222222222222222222222222222"),
+    const taskAccountInfo = await connection.getProgramAccounts(
+      new PublicKey("Koiitask22222222222222222222222222222222222")
+      , {
+        filters: [{
+          memcmp: {
+            offset: 0, // offset where the whitelisted bytes start
+            bytes: 'aRN1MbEZhbr2W97MTP3RhQjjqHgoZN' // Your byte string needs to be base58 or hex encoded
+          }
+        }]
+      }
+    );
 
-  );
-  console.log("Fetching time:", new Date());
-  console.log(taskAccountInfo);
+  const dataSize = new TextEncoder().encode(JSON.stringify(taskAccountInfo)).length;
+  console.log("Data size in bytes:", dataSize);
+  
+  console.log("Fetching time got:", new Date());
   if (taskAccountInfo === null) {
-    // eslint-disable-next-line no-throw-literal
     throw 'Error: cannot find the task contract data';
   }
-//   taskAccountInfo = taskAccountInfo.filter(
-//     (e) =>
-//       e.account.data.length > config.node.MINIMUM_ACCEPTED_LENGTH_TASK_CONTRACT
-//   );
+
   const tasks = taskAccountInfo
     .map((rawData) => {
       try {
@@ -100,6 +105,9 @@ async function fetchAllTasksWithTimeout() {
 async function main() {
     try{
     const taskdata = await fetchAllTasksWithTimeout();
+    if(taskdata.length==null){
+      return;
+    }
     console.log(taskdata);
     // loop taskdata
     for (let i = 0; i < taskdata.length; i++) {
@@ -140,9 +148,14 @@ async function main() {
             }
         }
         
+
+        
     }
+    console.log("Memory usage: ", process.memoryUsage());
     }catch(e){
         console.log(e);
+        console.log("Memory usage: ", process.memoryUsage());
+
     }
 }
 
