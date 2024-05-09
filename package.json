@@ -2,7 +2,8 @@
   "dependencies": {
     "@_koi/web3.js": "^0.0.7",
     "axios": "^1.6.8",
-    "config": "^3.3.11"
+    "config": "^3.3.11",
+    "dotenv": "^16.4.5"
   },
   "name": "task-bounty-tracker",
   "version": "1.0.0",
