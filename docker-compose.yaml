@@ -1,0 +1,10 @@
+version: '3.8'
+services:
+  service1:
+    image: hermanyiqunliang/taskmonitor
+    env_file:
+      - .env.bounty
+  service2:
+    image: hermanyiqunliang/nodesmonitor
+    env_file:
+      - .env.nodes

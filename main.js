@@ -1,7 +1,8 @@
 const { PublicKey, Connection } = require('@_koi/web3.js');
 const config = require('config');
 const axios = require('axios');
-const webhookUrl = 'https://hooks.slack.com/services/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';
+require('dotenv').config();
+const webhookUrl = process.env.WEBHOOK_URL;
 const connection = new Connection("https://testnet.koii.network","confirmed");
 
 function parseRawK2TaskData({
@@ -178,7 +179,7 @@ async function main() {
     }
 }
 
-
+console.log("Webhook URL: ", webhookUrl);
 main();
 setInterval(main, 600000);
 
