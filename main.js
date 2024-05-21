@@ -1,14 +1,20 @@
 const { PublicKey, Connection } = require('@_koi/web3.js');
+// const fs = require('fs');
 const config = require('config');
 const axios = require('axios');
 require('dotenv').config();
 const webhookUrl = process.env.WEBHOOK_URL;
 const connection = new Connection("https://testnet.koii.network","confirmed");
-
+// let x = 0;
 function parseRawK2TaskData({
     rawTaskData,
     hasError = false,
   }) {
+    // if (x == 0) {
+    //   fs.writeFileSync('rawTaskData.txt',  JSON.stringify(rawTaskData, null, 2), 'utf8'); // 写入文件
+    // x=1;
+    // console.log("rawtaskdatahere");
+    // }
     return {
       taskName: rawTaskData.task_name,
       taskManager: new PublicKey(rawTaskData.task_manager).toBase58(),
@@ -79,6 +85,7 @@ async function fetchAllTasks(){
         };
         return task;
       } catch (e) {
+        console.error('Error parsing task data:', e);
         return null;
       }
     })
