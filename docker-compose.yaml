@@ -3,7 +3,7 @@ services:
   service1:
     image: hermanyiqunliang/taskmonitor
     env_file:
-      - .env.bounty
+      - .env.bounty.production
     restart: always  # 设置服务退出时总是重启
 
   service2:

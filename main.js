@@ -110,6 +110,36 @@ async function fetchAllTasksWithTimeout() {
     }
 }
 
+async function sendBountyOutMessage(taskdata,i){
+  const msg = "Task "+ taskdata[i].data.taskName+ " Bounty out! Task public key: "+ taskdata[i].publicKey;
+  const message = {
+      text: msg
+  };
+  await axios.post(webhookUrl, message)
+  .then(response => {
+      console.log('Message sent: ', response.data);
+  })
+  .catch(error => {
+      console.error('Error sending message: ', error);
+  }); 
+}
+
+async function sendBountyInsufficientMessage(taskdata,i){
+  const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
+  const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey;
+  console.log(msg);
+  const message = {
+      text: msg
+  };
+  await axios.post(webhookUrl, message)
+  .then(response => {
+      console.log('Message sent: ', response.data);
+  })
+  .catch(error => {
+      console.error('Error sending message: ', error);
+  });  
+}
+
 async function main() {
     try{
     const taskdata = await fetchAllTasksWithTimeout();
@@ -122,61 +152,27 @@ async function main() {
         console.log(taskdata[i].data.taskName, taskdata[i].data.totalBountyAmount, taskdata[i].data.bountyAmountPerRound);
 
         if(Number(taskdata[i].data.totalBountyAmount)<Number(taskdata[i].data.bountyAmountPerRound)){
-            const msg = "Task "+ taskdata[i].data.taskName+ " Bounty out! Task public key: "+ taskdata[i].publicKey;
-            const message = {
-                text: msg
-            };
-            const response = await axios.post(webhookUrl, message)
-            .then(response => {
-                console.log('Message sent: ', response.data);
-            })
-            .catch(error => {
-                console.error('Error sending message: ', error);
-            });  
+            sendBountyOutMessage(taskdata,i);
         }else{
+          // Upload Last Round Submission
+          
             if(Number(taskdata[i].data.totalBountyAmount)<Number((taskdata[i].data.bountyAmountPerRound))*10){
                 if (taskdata[i].data.taskName == "Free Token Task!"){
                   if(Number(taskdata[i].data.totalBountyAmount)<Number((taskdata[i].data.bountyAmountPerRound))*2){
-                      const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
-                      const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey;
-                      console.log(msg);
-                      const message = {
-                          text: msg
-                      };
-                      const response = await axios.post(webhookUrl, message)
-                      .then(response => {
-                          console.log('Message sent: ', response.data);
-                      })
-                      .catch(error => {
-                          console.error('Error sending message: ', error);
-                      });  
+                      await sendBountyInsufficientMessage(taskdata,i);
                       continue;
                   }else{
                       continue;
                   }
                 }
-                const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
-                const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey;
-                console.log(msg);
-                const message = {
-                    text: msg
-                };
-                const response = await axios.post(webhookUrl, message)
-                .then(response => {
-                    console.log('Message sent: ', response.data);
-                })
-                .catch(error => {
-                    console.error('Error sending message: ', error);
-                });  
+                sendBountyInsufficientMessage(taskdata,i);
             }else{
                 const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
                 const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey;
                 console.log(msg);
             }
         }
-        
-
-        
+           
     }
     console.log("Memory usage: ", process.memoryUsage());
     }catch(e){
