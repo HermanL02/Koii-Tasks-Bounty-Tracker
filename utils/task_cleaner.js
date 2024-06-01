@@ -104,14 +104,13 @@ async function main() {
     const stakePotAccount = task.data.stakePotAccount;
     const stakePotAccountBalance = await connection.getBalance(new PublicKey(stakePotAccount));
     const stakePotAccountEmpty = stakePotAccountBalance/(10**9) <=100;
-    console.log(stakePotAccountBalance);
     // all the conditions
     if (notIPFS && notIPFS2 && notMigrated && notWhitelisted && stakePotAccountEmpty) {
-      console.log("Delete ", task.publicKey);
+      console.log(task.publicKey, task.data.taskName);
       deleteTasksnum++;
     }
     
   }  
-  console.log("Delete tasks number: ", deleteTasksnum);
+  // console.log(deleteTasksnum);
 }
 main();
