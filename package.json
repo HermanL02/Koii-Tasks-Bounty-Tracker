@@ -1,6 +1,7 @@
 {
   "dependencies": {
     "@_koi/web3.js": "^0.0.7",
+    "@_koii/web3.js": "^0.1.11",
     "axios": "^1.6.8",
     "config": "^3.3.11",
     "dotenv": "^16.4.5",
