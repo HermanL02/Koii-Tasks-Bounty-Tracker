@@ -1,20 +1,13 @@
 const { PublicKey, Connection } = require('@_koi/web3.js');
-// const fs = require('fs');
 const config = require('config');
 const axios = require('axios');
 require('dotenv').config();
 const webhookUrl = process.env.WEBHOOK_URL;
 const connection = new Connection("https://testnet.koii.network","confirmed");
-// let x = 0;
 function parseRawK2TaskData({
     rawTaskData,
     hasError = false,
   }) {
-    // if (x == 0) {
-    //   fs.writeFileSync('rawTaskData.txt',  JSON.stringify(rawTaskData, null, 2), 'utf8'); // 写入文件
-    // x=1;
-    // console.log("rawtaskdatahere");
-    // }
     return {
       taskName: rawTaskData.task_name,
       taskManager: new PublicKey(rawTaskData.task_manager).toBase58(),
@@ -41,14 +34,6 @@ function parseRawK2TaskData({
       distributionRewardsSubmission: rawTaskData.distribution_rewards_submission,
     };
   }
-// const whitelistedFilter = {
-//     memcmp: {
-//       offset: 0 /* offset where the whitelisted bytes start */,
-//       bytes: 'aRN1MbEZhbr2W97MTP3RhQjjqHgoZN',
-//     },
-//   };
-
-// const getProgramAccountFilter = () => [whitelistedFilter];
 async function fetchAllTasks(){
     console.log("Fetching start time:", new Date());
     const taskAccountInfo = await connection.getProgramAccounts(
@@ -147,14 +132,12 @@ async function main() {
       return;
     }
     console.log(taskdata);
-    // loop taskdata
     for (let i = 0; i < taskdata.length; i++) {
         console.log(taskdata[i].data.taskName, taskdata[i].data.totalBountyAmount, taskdata[i].data.bountyAmountPerRound);
 
         if(Number(taskdata[i].data.totalBountyAmount)<Number(taskdata[i].data.bountyAmountPerRound)){
             sendBountyOutMessage(taskdata,i);
         }else{
-          // Upload Last Round Submission
           
             if(Number(taskdata[i].data.totalBountyAmount)<Number((taskdata[i].data.bountyAmountPerRound))*10){
                 if (taskdata[i].data.taskName == "Free Token Task!"){
