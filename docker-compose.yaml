@@ -11,3 +11,8 @@ services:
     env_file:
       - .env.nodes
     restart: always 
+  service3:
+    image: hermanyiqunliang/token-swap-tracker
+    env_file:
+      - .env.token
+    restart: always 
