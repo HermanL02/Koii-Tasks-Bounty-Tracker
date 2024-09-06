@@ -16,3 +16,10 @@ services:
     env_file:
       - .env.token
     restart: always 
+  service4:
+    image: hermanyiqunliang/temp-kpl-airdrop
+    env_file:
+      - .env.airdrop
+    ports:
+      - "3000:3000"
+    restart: always

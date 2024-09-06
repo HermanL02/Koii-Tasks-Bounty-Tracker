@@ -5,63 +5,80 @@ require('dotenv').config();
 const webhookUrl = process.env.WEBHOOK_URL;
 const connection = new Connection("https://testnet-rpc-1.koii.network", "confirmed");
 const fs = require('fs');
-async function fetchAllTasks(){
+
+async function fetchSegmentedTasks(programId, filter, segmentSize = 1000) {
+  let offset = 0;
+  let allAccounts = [];
+  while (true) {
+    const taskAccountInfo = await connection.getProgramAccounts(
+      programId,
+      {
+        filters: [
+          {
+            memcmp: {
+              offset: 0,
+              bytes: filter,
+            },
+          },
+          {
+            dataSize: segmentSize,
+          },
+        ],
+        encoding: 'base64',
+      }
+    );
+
+    if (taskAccountInfo.length === 0) {
+      break;
+    }
+
+    allAccounts = allAccounts.concat(taskAccountInfo);
+    offset += taskAccountInfo.length;
+
+    if (taskAccountInfo.length < segmentSize) {
+      break;
+    }
+  }
+  return allAccounts;
+}
+
+async function fetchAllTasks() {
   console.log("Fetching start time:", new Date());
-  const taskAccountInfo = await connection.getProgramAccounts(
-    new PublicKey("Koiitask22222222222222222222222222222222222")
-    , {
-      filters: [{
-        memcmp: {
-          offset: 0, 
-          bytes: 'EtkQ6Ue' 
-        }
-      }]
-    }
-  );
 
+  const programId = new PublicKey("Koiitask22222222222222222222222222222222222");
+  const base64Filter = 'EtkQ6Ue';
 
+  const taskAccountInfo = await fetchSegmentedTasks(programId, base64Filter);
 
-console.log("Fetching time got:", new Date());
-if (taskAccountInfo === null) {
-  throw 'Error: cannot find the task contract data';
+  console.log("Fetching time got:", new Date());
+  if (taskAccountInfo === null) {
+    throw 'Error: cannot find the task contract data';
+  }
+
+  const tasks = taskAccountInfo
+    .map((rawData) => {
+      try {
+        const rawTaskData = {
+          ...(JSON.parse(rawData.account.data.toString())),
+          task_id: rawData.pubkey.toBase58(),
+        };
+        const taskData = parseRawK2TaskData({ rawTaskData });
+        const task = {
+          publicKey: rawData.pubkey.toBase58(),
+          data: taskData,
+        };
+        return task;
+      } catch (e) {
+        console.error('Error parsing task data:', e);
+        return null;
+      }
+    })
+    .filter((task) => task !== null);
+
+  return tasks;
 }
 
-const tasks = taskAccountInfo
-  .map((rawData) => {
-    try {
-      const rawTaskData = {
-        ...(JSON.parse(rawData.account.data.toString())),
-        task_id: rawData.pubkey.toBase58(),
-      };
-      const taskData = parseRawK2TaskData({ rawTaskData });
-      const task = {
-        publicKey: rawData.pubkey.toBase58(),
-        data: taskData,
-      };
-      return task;
-    } catch (e) {
-      console.error('Error parsing task data:', e);
-      return null;
-    }
-  })
-
-  .filter(
-    (task) =>
-      task !== null 
-  );
-
-
-return tasks;
-}
-function parseRawK2TaskData({
-  rawTaskData,
-  hasError = false,
-}) {
-  // if (x == 0) {
-  //   fs.writeFileSync('rawTaskData.txt',  JSON.stringify(rawTaskData, null, 2), 'utf8'); // 写入文件
-  // x=1;
-  // console.log("rawtaskdatahere");
-  // }
+function parseRawK2TaskData({ rawTaskData, hasError = false }) {
   return {
     taskName: rawTaskData.task_name,
     taskManager: new PublicKey(rawTaskData.task_manager).toBase58(),
@@ -88,29 +105,25 @@ function parseRawK2TaskData({
     distributionRewardsSubmission: rawTaskData.distribution_rewards_submission,
   };
 }
+
 async function main() {
   const alltasks = await fetchAllTasks();
   let deleteTasksnum = 0;
   for (const task of alltasks) {
-    // condition 1 not IPFS
     const notIPFS = task.publicKey != "E2yxYLgVmPDNXxiKsdNZsDV5vnNZDwWSssKFbn24tMu2";
     const notIPFS2 = task.publicKey != "CjYHJjhtJjXp7X4yw4Z9w3BEPLe7dgNSB3FzKDs9Qn7x";
-    // TODO: Add ezsandbox testing
-    // condition 2 not migrated
     const notMigrated = task.data.isMigrated == false;
-    // condition 3 not whitelisted
     const notWhitelisted = task.data.isWhitelisted == false;
-    // condition 3 stakepotaccount is empty
     const stakePotAccount = task.data.stakePotAccount;
     const stakePotAccountBalance = await connection.getBalance(new PublicKey(stakePotAccount));
-    const stakePotAccountEmpty = stakePotAccountBalance/(10**9) <=100;
-    // all the conditions
+    const stakePotAccountEmpty = stakePotAccountBalance / (10**9) <= 100;
+
     if (notIPFS && notIPFS2 && notMigrated && notWhitelisted && stakePotAccountEmpty) {
       console.log(task.publicKey, task.data.taskName);
       deleteTasksnum++;
     }
-    
-  }  
-  // console.log(deleteTasksnum);
+  }
+  console.log(`Number of tasks to delete: ${deleteTasksnum}`);
 }
+
 main();
