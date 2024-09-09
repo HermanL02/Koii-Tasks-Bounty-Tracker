@@ -36,6 +36,7 @@ async function sendBountyOutMessage(taskdata,i){
   }
   
   async function main() {
+      const allWarningTaskData = [];
       try{
         const KPLTaskData = await fetchKPL();
         console.log(KPLTaskData);
@@ -55,13 +56,16 @@ async function sendBountyOutMessage(taskdata,i){
             
               if(Number(taskdata[i].data.totalBountyAmount)<Number((taskdata[i].data.bountyAmountPerRound))*10){
                   if (taskdata[i].data.taskName.includes("Free")){
+                    
                     if(Number(taskdata[i].data.totalBountyAmount)<Number((taskdata[i].data.bountyAmountPerRound))*2){
+                        allWarningTaskData.push(taskdata[i]);
                         await sendBountyInsufficientMessage(taskdata,i);
                         continue;
                     }else{
                         continue;
                     }
                   }
+                  allWarningTaskData.push(taskdata[i]);
                   sendBountyInsufficientMessage(taskdata,i);
               }else{
                   const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
@@ -77,11 +81,14 @@ async function sendBountyOutMessage(taskdata,i){
           console.log("Memory usage: ", process.memoryUsage());
   
       }
+      return allWarningTaskData;
   }
   
   console.log("Webhook URL: ", webhookUrl);
   main();
   setInterval(main, 600000);
   
+
+  module.exports = main;
   
   
