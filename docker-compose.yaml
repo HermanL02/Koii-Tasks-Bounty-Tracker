@@ -6,23 +6,23 @@ services:
       - .env.bounty
     restart: always 
 
-  service2:
-    image: hermanyiqunliang/nodesmonitor
-    env_file:
-      - .env.nodes
-    restart: always 
+  # service2:
+  #   image: hermanyiqunliang/nodesmonitor
+  #   env_file:
+  #     - .env.nodes
+  #   restart: always 
   service3:
     image: hermanyiqunliang/token-swap-tracker
     env_file:
       - .env.token
     restart: always 
-  service4:
-    image: hermanyiqunliang/temp-kpl-airdrop
-    env_file:
-      - .env.airdrop
-    ports:
-      - "3000:3000"
-    restart: always
+  # service4:
+  #   image: hermanyiqunliang/temp-kpl-airdrop
+  #   env_file:
+  #     - .env.airdrop
+  #   ports:
+  #     - "3000:3000"
+  #   restart: always
   service5:
     image: hermanyiqunliang/auto-funder-express
     env_file:
