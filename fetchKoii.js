@@ -1,6 +1,6 @@
 const { PublicKey, Connection } = require('@_koi/web3.js');
 
-const connection = new Connection("https://testnet.koii.network","confirmed");
+const connection = new Connection("https://mainnet.koii.network","confirmed");
 function parseRawK2TaskData({
     rawTaskData,
     hasError = false,

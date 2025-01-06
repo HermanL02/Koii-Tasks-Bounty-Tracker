@@ -1,7 +1,7 @@
 const  { Connection, PublicKey }=require( '@_koi/web3.js');
 
 async function getTaskBalance(taskId) {
-    const connection = new Connection('https://testnet.koii.network');
+    const connection = new Connection('https://mainnet.koii.network');
     const taskState = await connection.getAccountInfo(new PublicKey(taskId));
     let taskStateJSON = null;
     if (taskState) {

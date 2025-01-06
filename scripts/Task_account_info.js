@@ -5,7 +5,7 @@ const config = require('config');
 const axios = require('axios');
 require('dotenv').config();
 const webhookUrl = process.env.WEBHOOK_URL;
-const connection = new Connection("https://testnet.koii.network","confirmed");
+const connection = new Connection("https://mainnet.koii.network","confirmed");
 
 const programPublicKey = new PublicKey('6GbwkdtaTUjxJfGEgYxnDsqdCz36zRqbYpfNfyhnAqg1');
 

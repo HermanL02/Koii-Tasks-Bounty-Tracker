@@ -23,3 +23,10 @@ services:
     ports:
       - "3000:3000"
     restart: always
+  service5:
+    image: hermanyiqunliang/auto-funder-express
+    env_file:
+      - .env.funder
+    ports:
+      - "3100:3000"
+    restart: always

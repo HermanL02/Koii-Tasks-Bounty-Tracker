@@ -1,6 +1,6 @@
 const { Connection, PublicKey } = require('@_koii/web3.js');
 const base58 = require('bs58');
-const rpcUrl = 'https://testnet.koii.network';
+const rpcUrl = 'https://mainnet.koii.network';
 const connection = new Connection(rpcUrl, {
     commitment: 'confirmed',
     disableRetryOnRateLimit: true,
@@ -40,7 +40,7 @@ const { borsh_bpf_js_deserialize, } = require('./webasm_bincode_deserializer/bin
 
   async function deserializeTaskState(taskPublicKey) {
     console.log(taskPublicKey);
-    const rpcUrl = process.env.K2_NODE_URL || 'https://testnet.koii.network';
+    const rpcUrl = process.env.K2_NODE_URL || 'https://mainnet.koii.network';
     const connection = new Connection(rpcUrl, {
       commitment: 'confirmed',
       disableRetryOnRateLimit: true,
