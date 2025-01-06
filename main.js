@@ -6,7 +6,7 @@ const axios = require('axios');
 require('dotenv').config();
 const webhookUrl = process.env.WEBHOOK_URL;
 async function sendBountyOutMessage(taskdata,i){
-    const msg = "Task "+ taskdata[i].data.taskName+ " Bounty out! Task public key: "+ taskdata[i].publicKey;
+    const msg = "Task "+ taskdata[i].data.taskName+ " Bounty out! Task public key: "+ taskdata[i].publicKey + "Please use command /funder " + taskdata[i].publicKey + " 100000";
     const message = {
         text: msg
     };
@@ -21,7 +21,7 @@ async function sendBountyOutMessage(taskdata,i){
   
   async function sendBountyInsufficientMessage(taskdata,i){
     const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
-    const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey;
+    const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey + "Please use command /funder " + taskdata[i].publicKey + " 100000";
     console.log(msg);
     const message = {
         text: msg
@@ -69,7 +69,7 @@ async function sendBountyOutMessage(taskdata,i){
                   sendBountyInsufficientMessage(taskdata,i);
               }else{
                   const remainingRounds = Math.floor(taskdata[i].data.totalBountyAmount/taskdata[i].data.bountyAmountPerRound);
-                  const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey;
+                  const msg = "Task "+ taskdata[i].data.taskName+ " Bounty Less than "+ remainingRounds+ " rounds! "+ taskdata[i].publicKey + "Please use command /funder " + taskdata[i].publicKey + " 100000";
                   console.log(msg);
               }
           }
